@@ -362,6 +362,10 @@ func (s *Sender) createReplacingTransaction(tx *gethTypes.Transaction, baseFee, 
 		originalGasPrice := tx.GasPrice()
 		gasPrice := new(big.Int).Mul(originalGasPrice, escalateMultipleNum)
 		gasPrice = new(big.Int).Div(gasPrice, escalateMultipleDen)
+		baseFeeInt := new(big.Int).SetUint64(baseFee)
+		if gasPrice.Cmp(baseFeeInt) < 0 {
+			gasPrice = baseFeeInt
+		}
 		if gasPrice.Cmp(maxGasPrice) > 0 {
 			gasPrice = maxGasPrice
 		}
