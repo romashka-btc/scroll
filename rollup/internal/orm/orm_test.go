@@ -560,7 +560,7 @@ func TestPendingTransactionOrm(t *testing.T) {
 	err = pendingTransactionOrm.InsertPendingTransaction(context.Background(), "test", senderMeta, tx1, 0)
 	assert.NoError(t, err)
 
-	err = pendingTransactionOrm.UpdatePendingTransactionStatusByTxHash(context.Background(), tx0.Hash(), types.TxStatusReplaced)
+	err = pendingTransactionOrm.UpdateTransactionStatusByTxHash(context.Background(), tx0.Hash(), types.TxStatusReplaced)
 	assert.NoError(t, err)
 
 	txs, err := pendingTransactionOrm.GetPendingOrReplacedTransactionsBySenderType(context.Background(), senderMeta.Type, 2)
@@ -577,7 +577,7 @@ func TestPendingTransactionOrm(t *testing.T) {
 	assert.Equal(t, senderMeta.Address.String(), txs[1].SenderAddress)
 	assert.Equal(t, senderMeta.Type, txs[1].SenderType)
 
-	err = pendingTransactionOrm.UpdatePendingTransactionStatusByTxHash(context.Background(), tx1.Hash(), types.TxStatusConfirmed)
+	err = pendingTransactionOrm.UpdateTransactionStatusByTxHash(context.Background(), tx1.Hash(), types.TxStatusConfirmed)
 	assert.NoError(t, err)
 
 	txs, err = pendingTransactionOrm.GetPendingOrReplacedTransactionsBySenderType(context.Background(), senderMeta.Type, 2)
@@ -594,4 +594,17 @@ func TestPendingTransactionOrm(t *testing.T) {
 	status, err := pendingTransactionOrm.GetTxStatusByTxHash(context.Background(), tx0.Hash())
 	assert.NoError(t, err)
 	assert.Equal(t, types.TxStatusConfirmedFailed, status)
+
+	// Test DeleteTransactionByTxHash
+	err = pendingTransactionOrm.DeleteTransactionByTxHash(context.Background(), tx0.Hash())
+	assert.NoError(t, err)
+
+	// Verify the transaction is deleted
+	status, err = pendingTransactionOrm.GetTxStatusByTxHash(context.Background(), tx0.Hash())
+	assert.NoError(t, err)
+	assert.Equal(t, types.TxStatusUnknown, status) // Should return unknown status for deleted transaction
+
+	// Try to delete non-existent transaction
+	err = pendingTransactionOrm.DeleteTransactionByTxHash(context.Background(), common.HexToHash("0x123"))
+	assert.Error(t, err) // Should return error for non-existent transaction
 }
