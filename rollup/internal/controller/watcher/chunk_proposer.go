@@ -295,6 +295,7 @@ func (p *ChunkProposer) proposeChunk() error {
 	}
 
 	var chunk encoding.Chunk
+	chunk.Blocks = make([]*encoding.Block, 0, len(blocks))
 	for i, block := range blocks {
 		chunk.Blocks = append(chunk.Blocks, block)
 
