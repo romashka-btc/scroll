@@ -232,7 +232,7 @@ func (bp *BatchProverTask) formatProverTask(ctx context.Context, task *orm.Prove
 }
 
 func (bp *BatchProverTask) recoverActiveAttempts(ctx *gin.Context, batchTask *orm.Batch) {
-	if err := bp.chunkOrm.DecreaseActiveAttemptsByHash(ctx.Copy(), batchTask.Hash); err != nil {
+	if err := bp.batchOrm.DecreaseActiveAttemptsByHash(ctx.Copy(), batchTask.Hash); err != nil {
 		log.Error("failed to recover batch active attempts", "hash", batchTask.Hash, "error", err)
 	}
 }
